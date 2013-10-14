@@ -93,8 +93,11 @@
 		 				ads_html[val['adunitid']] = val['html'];
 		 			});
 		 			for(i = 0; i < ads.length; i++) {
-						var zone = ads[i].getAttribute(defaults.zone_attribute);
-						$(ads[i]).html(ads_html[zone]);
+						if(ads[i].getStyle('display') == 'block') {
+							var zone = ads[i].getAttribute(defaults.zone_attribute);
+							//$(ads[i]).html(ads_html[zone]);
+							postscribe(ads[i], ads_html[zone]);
+						}
 					}
 			  	}
 			});
