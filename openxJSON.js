@@ -28,15 +28,13 @@
 		// Go through visible advert elements in DOM and gather zone IDs
 		for(i = 0; i < ads.length; i++) {
 			var zone = ads[i].getAttribute(defaults.zone_attribute);
-			if(ads[i].getStyle('display') == 'block') {
+			if($(ads[i]).css('display') == 'block') {
 				zones.push(zone);
 				get_ads = true;
 			}
 		}
 
 		if(zones) {
-			
-			openx_json = openx_json + 'auid=' + zones.toString();
 
 			// Check if Ad Unit Groups have been passed and that all relevant zones are present
 			if(defaults.ad_unit_groups) {
@@ -53,15 +51,31 @@
 						family_count++;
 					});
 
+					// If Ad Unit Group IDs on the page then include pgid
 					if(count == family_count) {
 						zone_groups.push(val.id);
+
+						// Remove Ad Unit Group ad IDs from general auid list
+						$.each(val.family, function(key, val) {
+							var i = zones.indexOf(val);
+							if(i != -1) {
+								zones.splice(i, 1);
+							}
+						});
+
 					}
 
 				});
 
+				openx_json = openx_json + 'auid=' + zones.toString();
 				openx_json = openx_json + '&pgid=' + zone_groups.toString();
 
+			} else {
+
+				openx_json = openx_json + 'auid=' + zones.toString();
+
 			}
+
 		}
 		
 		// Append custom variables
@@ -93,10 +107,11 @@
 		 				ads_html[val['adunitid']] = val['html'];
 		 			});
 		 			for(i = 0; i < ads.length; i++) {
-						if(ads[i].getStyle('display') == 'block') {
+						if($(ads[i]).css('display') == 'block') {
 							var zone = ads[i].getAttribute(defaults.zone_attribute);
-							//$(ads[i]).html(ads_html[zone]);
-							postscribe(ads[i], ads_html[zone]);
+							if(ads_html[zone]) {
+								postscribe(ads[i], ads_html[zone]);
+							}
 						}
 					}
 			  	}
